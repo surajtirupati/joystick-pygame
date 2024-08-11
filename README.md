@@ -1,6 +1,9 @@
 # **Joystick-Controlled Game with Arduino Input**
 
-This project is a Python-based arcade-style game that uses an Arduino joystick for input. The joystick controls the movement of the main character, and various game elements such as bullets, money, and other objects are managed within the game. The game also includes sound effects that enhance the gaming experience.
+This project is a Python-based arcade-style game that uses an Arduino joystick for input. The joystick controls the movement of the main character, and various game elements such as bullets, money, and other objects are managed within the game. The game also includes sound effects that enhance the gaming experience. The purpose of the game is simple - dodge the bullets, and collect the money.
+
+![game](https://github.com/user-attachments/assets/c386f9fb-8d37-4cd3-ab5f-5c5e0b6cac96)
+
 
 ## **Table of Contents**
 
