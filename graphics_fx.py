@@ -8,6 +8,9 @@ gunshot_sound.set_volume(0.1)
 background_music = pygame.mixer.Sound('sounds/background.mp3')
 background_channel = pygame.mixer.Channel(1)
 background_music.set_volume(0.1)
+cash_sound = pygame.mixer.Sound('sounds/cash.mp3')
+cash_channel = pygame.mixer.Channel(2)
+cash_sound.set_volume(0.4)
 
 # Load images
 character_image = pygame.image.load('images/50.png')

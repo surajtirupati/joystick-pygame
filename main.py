@@ -77,6 +77,7 @@ class Game:
         if self.money.visible and self.character.check_collision(self.money.x, self.money.y):
             points = self.money.collect()
             self.score += points
+            cash_channel.play(cash_sound)
             self.collection_message = f"+${points}!"
             self.message_visible = True
             self.message_disappear_time = pygame.time.get_ticks()
