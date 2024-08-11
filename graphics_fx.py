@@ -5,6 +5,9 @@ from config import *
 gunshot_sound = pygame.mixer.Sound('sounds/gunshot.mp3')
 gunshot_channel = pygame.mixer.Channel(0)
 gunshot_sound.set_volume(0.1)
+background_music = pygame.mixer.Sound('sounds/background.mp3')
+background_channel = pygame.mixer.Channel(1)
+background_music.set_volume(0.1)
 
 # Load images
 character_image = pygame.image.load('images/50.png')

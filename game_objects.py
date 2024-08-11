@@ -40,8 +40,8 @@ class Character:
     def check_bullet_collision(self, bullets):
         for bullet in bullets:
             if self.check_collision(bullet[0], bullet[1], bullet_image.get_width(), bullet_image.get_height()):
-
                 gunshot_sound.play()
+                bullets.remove(bullet)
                 return True
 
         return False

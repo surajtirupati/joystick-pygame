@@ -53,6 +53,7 @@ SCROLL_SPEED = 2
 
 # Colour tuples
 BLOOD_RED = (120, 6, 6)
+MONEY_GREEN = (62, 156, 53)
 
 # Serial connection (joystick)
 SERIAL_PORT = 'COM3'
