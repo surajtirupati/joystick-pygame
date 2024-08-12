@@ -28,7 +28,7 @@ class Game:
         self.max_bullets = MAX_BULLETS
         self.bullet_interval_max = BULLET_INTERVAL_MAX
         self.leveler = LEVELER  # amount of cash to getting to faster bullet levels
-        self.bullet_interval_max_adj = 0.15
+        self.bullet_interval_max_adj = BULLET_INTERVAL_ADJ
 
         # Initialize joystick handler
         self.joystick = Joystick()
@@ -127,15 +127,19 @@ class Game:
             # Draw health bar
             self.draw_health_bar()
 
-            if self.collection_message_visible:
-                self.draw_collection_message()
-                if pygame.time.get_ticks() - self.collection_message_disappear_time > self.message_duration * 1000:
-                    self.collection_message_visible = False
+            # Show relevant messages
+            self.show_messages()
 
-            if self.level_up_msg_visible:
-                self.draw_message(LVL_UP_MSG, SKY_BLUE, font_size=48)
-                if pygame.time.get_ticks() - self.level_up_msg_disappear_time > self.message_duration * 1000:
-                    self.level_up_msg_visible = False
+    def show_messages(self):
+        if self.collection_message_visible:
+            self.draw_collection_message()
+            if pygame.time.get_ticks() - self.collection_message_disappear_time > self.message_duration * 1000:
+                self.collection_message_visible = False
+
+        if self.level_up_msg_visible:
+            self.draw_message(LVL_UP_MSG, SKY_BLUE, font_size=48)
+            if pygame.time.get_ticks() - self.level_up_msg_disappear_time > self.message_duration * 1000:
+                self.level_up_msg_visible = False
 
     def collect_money(self):
         # Check for collisions with money
