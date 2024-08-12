@@ -65,11 +65,16 @@ SKY_BLUE = (135, 206, 235)
 LVL_UP_MSG = "Next level - Get the doe homie, they shootin'!"
 
 # Serial connection (joystick)
+USE_ARDUINO = False
 SERIAL_PORT = 'COM3'
 BAUD_RATE = 9600
 
-# Initialize serial connection
-try:
-    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)  # Replace 'COM3' with your Arduino's serial port
-except Exception as e:
-    raise RuntimeError(f'Error with Serial Monitor: {e}')
+if USE_ARDUINO:
+    # Initialize serial connection
+    try:
+        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)  # Replace 'COM3' with your Arduino's serial port
+    except Exception as e:
+        raise RuntimeError(f'Error with Serial Monitor: {e}')
+
+else:
+    ser = None

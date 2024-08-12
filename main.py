@@ -1,9 +1,5 @@
 import pygame
 import sys
-import threading
-import time
-import random
-from config import *
 from graphics_fx import *
 from arduino_input_handler import Joystick
 from game_objects import Character, BulletManager, Money
@@ -32,7 +28,8 @@ class Game:
 
         # Initialize joystick handler
         self.joystick = Joystick()
-        self.joystick.start_reading()
+        if USE_ARDUINO:
+            self.joystick.start_reading()
 
         # Game state flag
         self.game_over = False

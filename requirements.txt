@@ -1,0 +1,9 @@
+pygame~=2.6.0
+numpy~=1.26.4
+gym~=0.21.0
+stable-baselines3
+
+torch~=2.4.0+cu118
+serial~=0.0.97
+pyserial~=3.5
+opencv-python~=4.10.0.84
