@@ -59,6 +59,11 @@ pip install pygame pyserial
 
 - Upload the Arduino sketch to your Arduino board. The sketch reads analog joystick input and a switch, sending the data over serial to the computer.
 - Ensure the Arduino is connected to your computer via USB and is communicating over the correct serial port.
+- Arduino sketch is found in file 'simpleJoystick.ino' -> I am using a Mega 2560 and have connected my x, y, and switch pins to A7, A6, and 50 (digital) respectively.
+
+  Below is an example schematic of the Arduino setup (replace the pins in display with whatever pins you choose - x and y must be analog and switch is digital):
+  
+![Joystick-Module-interfacing-with-Arduino](https://github.com/user-attachments/assets/f80c43d9-6b76-4572-b112-8d2849896c94)
 
 ### **4. Configure the Serial Connection**
 
