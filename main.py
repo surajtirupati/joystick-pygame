@@ -22,6 +22,13 @@ class Game:
 
         self.offset_y = 0
         self.score = 0
+        # Level related parameters
+        self.level = 1
+        self.bullet_speed = BULLET_SPEED
+        self.max_bullets = MAX_BULLETS
+        self.bullet_interval_max = BULLET_INTERVAL_MAX
+        self.leveler = LEVELER  # amount of cash to getting to faster bullet levels
+        self.bullet_interval_max_adj = 0.15
 
         # Initialize joystick handler
         self.joystick = Joystick()
@@ -33,8 +40,11 @@ class Game:
 
         # Collection message
         self.collection_message = ""
-        self.message_visible = False
-        self.message_disappear_time = None
+        self.collection_message_visible = False
+        self.level_up_msg_visible = False
+        self.faster_bullets_msg_visible = False
+        self.collection_message_disappear_time = None
+        self.level_up_msg_disappear_time = None
         self.message_duration = 1.0  # Duration the message stays visible in seconds
 
     def run(self):
@@ -70,19 +80,13 @@ class Game:
         velocity_x, velocity_y = self.joystick.get_velocity()
         self.character.move(velocity_x, velocity_y)
 
-        # Update bullets
-        self.bullet_manager.update()
+        self.level_up_bullets()
 
-        # Check for collisions with money
-        if self.money.visible and self.character.check_collision(self.money.x, self.money.y):
-            points = self.money.collect()
-            self.score += points
-            cash_channel.play(cash_sound)
-            self.collection_message = f"+${points}!"
-            self.message_visible = True
-            self.message_disappear_time = pygame.time.get_ticks()
+        self.bullet_manager.update(bullet_speed=self.bullet_speed, max_bullets=self.max_bullets, bullet_interval_max=self.bullet_interval_max)
 
-        elif not self.money.visible:
+        self.collect_money()
+
+        if not self.money.visible:
             self.money.respawn()
 
         if self.character.check_bullet_collision(self.bullet_manager.bullets):
@@ -123,10 +127,41 @@ class Game:
             # Draw health bar
             self.draw_health_bar()
 
-            if self.message_visible:
+            if self.collection_message_visible:
                 self.draw_collection_message()
-                if pygame.time.get_ticks() - self.message_disappear_time > self.message_duration * 1000:
-                    self.message_visible = False
+                if pygame.time.get_ticks() - self.collection_message_disappear_time > self.message_duration * 1000:
+                    self.collection_message_visible = False
+
+            if self.level_up_msg_visible:
+                self.draw_message(LVL_UP_MSG, SKY_BLUE, font_size=48)
+                if pygame.time.get_ticks() - self.level_up_msg_disappear_time > self.message_duration * 1000:
+                    self.level_up_msg_visible = False
+
+    def collect_money(self):
+        # Check for collisions with money
+        if self.money.visible and self.character.check_collision(self.money.x, self.money.y):
+            points = self.money.collect()
+            self.score += points
+            cash_channel.play(cash_sound)
+            self.collection_message = f"+${points}!"
+            self.collection_message_visible = True
+            self.collection_message_disappear_time = pygame.time.get_ticks()
+
+    def level_up_bullets(self):
+        # Update bullet difficulties
+        if (self.leveler * (self.level + 1)) > self.score > (self.leveler * self.level):
+            if self.level % 2 == 1:  # Odd levels: increase max bullets
+                self.max_bullets += 1
+            else:  # Even levels: increase bullet speed
+                self.bullet_speed += 1
+
+            if self.level % 3 == 0:
+                self.bullet_interval_max -= self.bullet_interval_max_adj
+
+            # Level up
+            self.level += 1
+            self.level_up_msg_visible = True
+            self.level_up_msg_disappear_time = pygame.time.get_ticks()
 
     def show_end_screen(self):
         # Stop the gunshot sound
@@ -158,8 +193,12 @@ class Game:
         self.character.reset_position()  # You need to implement this method in your character class
         self.character.health = START_HEALTH  # Set to whatever the initial health is
 
-        # Reset the score
+        # Reset the score and level parameters
         self.score = 0
+        self.level = 1
+        self.bullet_speed = BULLET_SPEED
+        self.max_bullets = MAX_BULLETS
+        self.leveler = LEVELER  # amount of cash to getting to faster bullet levels
 
         # Reset the bullet manager
         self.bullet_manager.reset()  # Implement this method in your bullet manager class
@@ -202,6 +241,24 @@ class Game:
         font = pygame.font.Font(None, 36)  # Use the default font, size 36
         message_text = font.render(self.collection_message, True, MONEY_GREEN)
         self.screen.blit(message_text, (self.money.x, self.money.y - 40))  # Display above the money
+
+    def draw_message(self, message, colour, x=None, y=None, font_size=36):
+        font = pygame.font.Font(None, font_size)
+        message_text = font.render(message, True, colour)
+
+        # Get the dimensions of the text
+        text_rect = message_text.get_rect()
+
+        # If x is not provided, center the text horizontally
+        if x is None:
+            x = (WINDOW_SIZE - text_rect.width) // 2
+
+        # If y is not provided, center the text vertically
+        if y is None:
+            y = (WINDOW_SIZE - text_rect.height) // 2
+
+        # Draw the text on the screen
+        self.screen.blit(message_text, (x, y))
 
 
 if __name__ == "__main__":

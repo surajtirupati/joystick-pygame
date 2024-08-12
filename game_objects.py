@@ -54,19 +54,29 @@ class BulletManager:
     def __init__(self):
         self.bullets = []
         self.last_bullet_time = time.time()
+        self.bullet_interval_min = BULLET_INTERVAL_MIN
+        self.bullet_interval_max = BULLET_INTERVAL_MAX
+        self.bullet_speed = BULLET_SPEED
+        self.max_bullets = MAX_BULLETS
         self.next_bullet_interval = random.uniform(BULLET_INTERVAL_MIN, BULLET_INTERVAL_MAX)
 
-    def update(self):
+    def update(self, bullet_speed, max_bullets, bullet_interval_max):
         # Move bullets
         for bullet in self.bullets:
-            bullet[1] += BULLET_SPEED
+            bullet[1] += bullet_speed
         self.bullets = [bullet for bullet in self.bullets if bullet[1] <= WINDOW_SIZE]
 
-        # Spawn new bullets
-        if len(self.bullets) < MAX_BULLETS and time.time() - self.last_bullet_time > self.next_bullet_interval:
-            self.spawn_bullet()
-            self.last_bullet_time = time.time()
-            self.next_bullet_interval = random.uniform(BULLET_INTERVAL_MIN, BULLET_INTERVAL_MAX)
+        # Dynamically adjust bullet interval based on active bullets and speed
+        if len(self.bullets) < max_bullets:
+            if time.time() - self.last_bullet_time > self.next_bullet_interval:
+                self.spawn_bullet()
+                self.last_bullet_time = time.time()
+                if bullet_interval_max < self.bullet_interval_min:
+                    temp = bullet_interval_max
+                    bullet_interval_max = self.bullet_interval_min
+                    self.bullet_interval_min = temp
+
+                self.next_bullet_interval = random.uniform(self.bullet_interval_min, bullet_interval_max)
 
     def spawn_bullet(self):
         bullet_x = random.randint(0, WINDOW_SIZE - bullet_image.get_width())
