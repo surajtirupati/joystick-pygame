@@ -5,28 +5,32 @@ import torch as th
 
 import warnings
 
-# Device
-device = th.device("cuda" if th.cuda.is_available() else "cpu")
 
-# Suppress warnings
-warnings.filterwarnings("ignore")
+def train_PPO(policy='MlpPolicy', model_name='ppo_pixel_obs', ent_coeff=0.0, learning_rate=0.003, clip_range=0.2):
+    # Device
+    device = th.device("cuda" if th.cuda.is_available() else "cpu")
 
-# Initialize your custom environment
-env = MyGameEnv()
+    # Suppress warnings
+    warnings.filterwarnings("ignore")
 
-# Check the environment to make sure it's correctly implemented
-check_env(env)
+    # Initialize your custom environment
+    env = MyGameEnv()
 
-# Create the RL agent
-model = PPO("MlpPolicy", env, verbose=1, device=device)
+    # Check the environment to make sure it's correctly implemented
+    check_env(env)
 
-# Train the agent
-model.learn(total_timesteps=100000)
+    # Create the RL agent
+    model = PPO(policy, env, verbose=1, device=device, ent_coef=ent_coeff, learning_rate=learning_rate, clip_range=clip_range)
 
-# Save the model
-model.save("ppo_game_agent")
+    # Train the agent
+    model.learn(total_timesteps=100000)
 
-# To load and continue training or use the agent:
-model = PPO.load("ppo_game_agent", env=env)
+    # Save the model
+    model.save(model_name)
 
 
+if __name__ == '__main__':
+    entropy_coefficient = 0.01
+    learn_rate = 0.0007
+    c_range = 0.45
+    train_PPO(ent_coeff=entropy_coefficient, learning_rate=learn_rate, clip_range=c_range)

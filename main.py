@@ -67,17 +67,19 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    def update(self):
+    def update(self, velocity_x=None, velocity_y=None):
         # Update scrolling background
         self.offset_y += SCROLL_SPEED
         if self.offset_y >= TILE_HEIGHT:
             self.offset_y = 0
 
         # Update character position
-        velocity_x, velocity_y = self.joystick.get_velocity()
+        if USE_ARDUINO:
+            velocity_x, velocity_y = self.joystick.get_velocity()
+
         self.character.move(velocity_x, velocity_y)
 
-        self.level_up_bullets()
+        #  self.level_up_bullets()
 
         self.bullet_manager.update(bullet_speed=self.bullet_speed, max_bullets=self.max_bullets, bullet_interval_max=self.bullet_interval_max)
 
