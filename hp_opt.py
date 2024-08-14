@@ -3,7 +3,7 @@ import torch as th
 import numpy as np
 from game_env import MyGameEnv
 from stable_baselines3 import PPO
-
+from PPO import PerformanceLoggerCallback
 
 class HyperparameterOptimizer:
     def __init__(self, model_str, env_class, reward_function, hyperparams, total_timesteps=10000, n_trials=20):
@@ -46,8 +46,14 @@ class HyperparameterOptimizer:
             **hyperparams
         )
 
+        # Initialize the performance logger callback
+        performance_logger = PerformanceLoggerCallback(trial.number, hyperparams)
+
         # Train the model
-        model.learn(total_timesteps=self.total_timesteps)
+        model.learn(total_timesteps=self.total_timesteps, callback=performance_logger)
+
+        # Save the plots for this trial
+        performance_logger.save_results()
 
         # Evaluate the model
         mean_reward = self.evaluate_model(model, env)

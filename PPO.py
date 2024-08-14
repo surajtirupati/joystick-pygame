@@ -1,3 +1,4 @@
+import os
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import BaseCallback
@@ -60,12 +61,15 @@ def retrain_PPO(model_name='game-state-obs-001-0007-03', ent_coeff=0.0, learning
 
 
 class PerformanceLoggerCallback(BaseCallback):
-    def __init__(self, verbose=0):
+    def __init__(self, trial_number, params, save_dir='plots', verbose=0):
         super(PerformanceLoggerCallback, self).__init__(verbose)
         self.episode_rewards = []
         self.episode_lengths = []
         self.current_episode_reward = 0
         self.current_episode_length = 0
+        self.trial_number = trial_number
+        self.params = params
+        self.save_dir = save_dir
 
     def _on_step(self) -> bool:
         # Accumulate reward and length
@@ -103,26 +107,26 @@ class PerformanceLoggerCallback(BaseCallback):
         plt.legend()
         plt.show()
 
-    def save_results(self, reward_filename='episode_rewards.png', length_filename='episode_lengths.png'):
+    def save_results(self):
         """Save the performance plots as PNG files."""
-        # Save rewards plot
+        # Plot rewards
         plt.figure(figsize=(12, 5))
         plt.plot(self.episode_rewards, label='Episode Reward')
         plt.xlabel('Episode')
         plt.ylabel('Reward')
-        plt.title('Episode Rewards Over Time')
+        plt.title(f'Reward Over Time - Trial {self.trial_number}\n{self.params}')
         plt.legend()
-        plt.savefig(reward_filename)
+        plt.savefig(os.path.join(self.save_dir, f'reward_trial_{self.trial_number}.png'))
         plt.close()
 
-        # Save episode lengths plot
+        # Plot episode lengths
         plt.figure(figsize=(12, 5))
         plt.plot(self.episode_lengths, label='Episode Length')
         plt.xlabel('Episode')
         plt.ylabel('Length')
-        plt.title('Episode Lengths Over Time')
+        plt.title(f'Episode Length Over Time - Trial {self.trial_number}\n{self.params}')
         plt.legend()
-        plt.savefig(length_filename)
+        plt.savefig(os.path.join(self.save_dir, f'length_trial_{self.trial_number}.png'))
         plt.close()
 
 
