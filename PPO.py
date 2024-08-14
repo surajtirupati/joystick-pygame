@@ -1,5 +1,8 @@
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.callbacks import BaseCallback
+import matplotlib.pyplot as plt
+
 from game_env import MyGameEnv
 import torch as th
 
@@ -23,14 +26,111 @@ def train_PPO(policy='MlpPolicy', model_name='ppo_pixel_obs', ent_coeff=0.0, lea
     model = PPO(policy, env, verbose=1, device=device, ent_coef=ent_coeff, learning_rate=learning_rate, clip_range=clip_range)
 
     # Train the agent
-    model.learn(total_timesteps=100000)
+    model.learn(total_timesteps=1000000)
 
     # Save the model
     model.save(model_name)
 
 
+def train_ppo_v2(policy='MlpPolicy', model_name='ppo_bullet_avoidance_reward_v2', ent_coeff=0.0, learning_rate=0.003, clip_range=0.2):
+    device = th.device("cuda" if th.cuda.is_available() else "cpu")
+
+    env = MyGameEnv(reward_function=MyGameEnv._calculate_rewards_v2)
+
+    model = PPO(policy, env, verbose=1, device=device, ent_coef=ent_coeff, learning_rate=learning_rate, clip_range=clip_range)
+
+    performance_logger = PerformanceLoggerCallback()
+
+    model.learn(total_timesteps=100000, callback=performance_logger)
+
+    model.save(model_name)
+
+    performance_logger.save_results(reward_filename=f'plots/{model_name}_rewards.png', length_filename=f'plots/{model_name}_lengths.png')
+
+
+def retrain_PPO(model_name='game-state-obs-001-0007-03', ent_coeff=0.0, learning_rate=0.003, clip_range=0.2):
+
+    env = MyGameEnv()
+
+    model = PPO.load(model_name, env=env)
+
+    model.learn(total_timesteps=10000000)
+
+    model.save("game-state-obs-001-0007-03-retrained")
+
+
+class PerformanceLoggerCallback(BaseCallback):
+    def __init__(self, verbose=0):
+        super(PerformanceLoggerCallback, self).__init__(verbose)
+        self.episode_rewards = []
+        self.episode_lengths = []
+        self.current_episode_reward = 0
+        self.current_episode_length = 0
+
+    def _on_step(self) -> bool:
+        # Accumulate reward and length
+        self.current_episode_reward += self.locals['rewards'][0]
+        self.current_episode_length += 1
+
+        # Check if the episode is done
+        if self.locals['dones'][0]:
+            # Log the results
+            self.episode_rewards.append(self.current_episode_reward)
+            self.episode_lengths.append(self.current_episode_length)
+
+            # Reset for the next episode
+            self.current_episode_reward = 0
+            self.current_episode_length = 0
+
+        return True
+
+    def plot_results(self):
+        # Plot rewards
+        plt.figure(figsize=(12, 5))
+        plt.plot(self.episode_rewards, label='Episode Reward')
+        plt.xlabel('Episode')
+        plt.ylabel('Reward')
+        plt.title('Episode Rewards Over Time')
+        plt.legend()
+        plt.show()
+
+        # Plot episode lengths
+        plt.figure(figsize=(12, 5))
+        plt.plot(self.episode_lengths, label='Episode Length')
+        plt.xlabel('Episode')
+        plt.ylabel('Length')
+        plt.title('Episode Lengths Over Time')
+        plt.legend()
+        plt.show()
+
+    def save_results(self, reward_filename='episode_rewards.png', length_filename='episode_lengths.png'):
+        """Save the performance plots as PNG files."""
+        # Save rewards plot
+        plt.figure(figsize=(12, 5))
+        plt.plot(self.episode_rewards, label='Episode Reward')
+        plt.xlabel('Episode')
+        plt.ylabel('Reward')
+        plt.title('Episode Rewards Over Time')
+        plt.legend()
+        plt.savefig(reward_filename)
+        plt.close()
+
+        # Save episode lengths plot
+        plt.figure(figsize=(12, 5))
+        plt.plot(self.episode_lengths, label='Episode Length')
+        plt.xlabel('Episode')
+        plt.ylabel('Length')
+        plt.title('Episode Lengths Over Time')
+        plt.legend()
+        plt.savefig(length_filename)
+        plt.close()
+
+
 if __name__ == '__main__':
-    entropy_coefficient = 0.01
-    learn_rate = 0.0007
-    c_range = 0.45
-    train_PPO(ent_coeff=entropy_coefficient, learning_rate=learn_rate, clip_range=c_range)
+    store_as = 'game-state-obs-0005-0007-03-reward-v2'
+    entropy_coefficient = 0.005
+    learn_rate = 0.0005
+    c_range = 0.3
+    train_ppo_v2(model_name=store_as, ent_coeff=entropy_coefficient, learning_rate=learn_rate, clip_range=c_range)
+
+    #  retrain_PPO()

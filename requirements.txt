@@ -7,3 +7,4 @@ torch~=2.4.0+cu118
 serial~=0.0.97
 pyserial~=3.5
 opencv-python~=4.10.0.84
+matplotlib~=3.9.1.post1

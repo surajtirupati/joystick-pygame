@@ -92,11 +92,12 @@ class BulletManager:
 
 class Money:
     def __init__(self):
+        self.appear_time = pygame.time.get_ticks()
         self.x = random.randint(0, WINDOW_SIZE - money_image.get_width())
         self.y = random.randint(0, WINDOW_SIZE - money_image.get_height())
         self.visible = True
         self.respawn_delay = random.uniform(RESPAWN_DELAY_MIN, RESPAWN_DELAY_MAX)
-        self.disappear_time = None
+        self.disappear_time = pygame.time.get_ticks()
 
     def draw(self, screen):
         if self.visible:
@@ -112,6 +113,7 @@ class Money:
             self.x = random.randint(0, WINDOW_SIZE - money_image.get_width())
             self.y = random.randint(0, WINDOW_SIZE - money_image.get_height())
             self.visible = True  # Ensure visibility is set to True here
+            self.appear_time = pygame.time.get_ticks()
             self.respawn_delay = random.uniform(RESPAWN_DELAY_MIN, RESPAWN_DELAY_MAX)
 
 
