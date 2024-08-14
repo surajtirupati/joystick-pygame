@@ -1,5 +1,7 @@
 import optuna
 import torch as th
+import numpy as np
+from game_env import MyGameEnv
 from stable_baselines3 import PPO
 
 
