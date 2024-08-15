@@ -80,7 +80,7 @@ class Game:
 
         self.character.move(velocity_x, velocity_y)
 
-        #  self.level_up_bullets()
+        self.level_up_bullets()
 
         self.bullet_manager.update(bullet_speed=self.bullet_speed, max_bullets=self.max_bullets, bullet_interval_max=self.bullet_interval_max)
 
