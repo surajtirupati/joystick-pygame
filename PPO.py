@@ -33,14 +33,14 @@ def train_PPO(policy='MlpPolicy', model_name='ppo_pixel_obs', ent_coeff=0.0, lea
     model.save(model_name)
 
 
-def train_ppo_v2(policy='MlpPolicy', model_name='ppo_bullet_avoidance_reward_v2', ent_coeff=0.0, learning_rate=0.003, clip_range=0.2):
+def train_ppo_v2(policy='MlpPolicy', model_name='ppo_bullet_avoidance_reward_v2', ent_coeff=0.0, learning_rate=0.003, clip_range=0.2, reward_function=MyGameEnv._calculate_reward):
     device = th.device("cuda" if th.cuda.is_available() else "cpu")
 
-    env = MyGameEnv(reward_function=MyGameEnv._calculate_rewards_v2)
+    env = MyGameEnv(reward_function=reward_function)
 
     model = PPO(policy, env, verbose=1, device=device, ent_coef=ent_coeff, learning_rate=learning_rate, clip_range=clip_range)
 
-    performance_logger = PerformanceLoggerCallback()
+    performance_logger = PerformanceLoggerCallback(trial_number=0, params=0)
 
     model.learn(total_timesteps=100000, callback=performance_logger)
 
@@ -131,10 +131,10 @@ class PerformanceLoggerCallback(BaseCallback):
 
 
 if __name__ == '__main__':
-    store_as = 'game-state-obs-0005-0007-03-reward-v2'
-    entropy_coefficient = 0.005
+    store_as = 'game-state-obs-0005-0007-03-reward-v3-bullet-dodge'
+    entropy_coefficient = 0.1
     learn_rate = 0.0005
     c_range = 0.3
-    train_ppo_v2(model_name=store_as, ent_coeff=entropy_coefficient, learning_rate=learn_rate, clip_range=c_range)
+    train_ppo_v2(model_name=store_as, ent_coeff=entropy_coefficient, learning_rate=learn_rate, clip_range=c_range, reward_function=MyGameEnv._calculate_reward)
 
     #  retrain_PPO()

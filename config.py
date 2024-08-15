@@ -66,6 +66,7 @@ LVL_UP_MSG = "Next level - Get the doe homie, they shootin'!"
 
 # Serial connection (joystick)
 USE_ARDUINO = False
+USE_KEYBOARD = True
 SERIAL_PORT = 'COM3'
 BAUD_RATE = 9600
 

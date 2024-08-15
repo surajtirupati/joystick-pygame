@@ -28,7 +28,8 @@ class Game:
 
         # Initialize joystick handler
         self.joystick = Joystick()
-        if USE_ARDUINO:
+
+        if USE_ARDUINO or USE_KEYBOARD:
             self.joystick.start_reading()
 
         # Game state flag
@@ -74,7 +75,7 @@ class Game:
             self.offset_y = 0
 
         # Update character position
-        if USE_ARDUINO:
+        if USE_ARDUINO or USE_KEYBOARD:
             velocity_x, velocity_y = self.joystick.get_velocity()
 
         self.character.move(velocity_x, velocity_y)
