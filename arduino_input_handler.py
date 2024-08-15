@@ -10,7 +10,6 @@ class Joystick:
         self.velocity_x = 0
         self.velocity_y = 0
 
-
     def start_reading(self):
         if USE_KEYBOARD:
             keyboard_thread = threading.Thread(target=self.read_keyboard, daemon=True)
